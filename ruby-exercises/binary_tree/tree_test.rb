@@ -5,7 +5,7 @@ require_relative 'tree'
 %w[pre in post].each do |prefix|
   define_method("show_#{prefix}order") do |tree|
     puts "\n\n"
-    puts "\nElements in #{prefix}order: "
+    puts "\nElements #{prefix}order: "
     meth = "#{prefix}order".to_sym
     tree.__send__(meth) { |node| puts node.data.to_s }
     puts "\nPrint #{prefix}order elements without a block: "

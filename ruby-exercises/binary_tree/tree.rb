@@ -54,12 +54,6 @@ class Tree
     root
   end
 
-  def find_tree_min(root)
-    nodes = []
-    bst_to_sorted_array(root, nodes)
-    nodes.min
-  end
-
   def level_order(root = @root)
     return if root.nil?
 
@@ -75,6 +69,7 @@ class Tree
     return data_results unless data_results.empty?
   end
 
+  # Dynamically declaring :preorder :inorder :postorder
   %w[pre in post].each do |prefix|
     define_method("#{prefix}order") do |results = [], root = @root, &block|
       return if root.nil?
@@ -94,24 +89,6 @@ class Tree
     return root if data == root.data
 
     data <= root.data ? find(data, root.left) : find(data, root.right)
-  end
-
-  def bst_to_sorted_array(root, nodes)
-    return if root.nil?
-
-    bst_to_sorted_array(root.left, nodes)
-    nodes << root
-    bst_to_sorted_array(root.right, nodes)
-  end
-
-  def sorted_array_to_balanced_bst(nodes, start_index, end_index)
-    return nil if start_index > end_index
-
-    mid_index = (start_index + end_index) / 2
-    root = nodes[mid_index]
-    root.left = sorted_array_to_balanced_bst(nodes, start_index, mid_index - 1)
-    root.right = sorted_array_to_balanced_bst(nodes, mid_index + 1, end_index)
-    root
   end
 
   def rebalance!
@@ -142,5 +119,31 @@ class Tree
     return 0 if root.nil?
 
     [depth(root.left), depth(root.right)].max + 1
+  end
+
+  private
+
+  def find_tree_min(root)
+    nodes = []
+    bst_to_sorted_array(root, nodes)
+    nodes.min
+  end
+
+  def bst_to_sorted_array(root, nodes)
+    return if root.nil?
+
+    bst_to_sorted_array(root.left, nodes)
+    nodes << root
+    bst_to_sorted_array(root.right, nodes)
+  end
+
+  def sorted_array_to_balanced_bst(nodes, start_index, end_index)
+    return nil if start_index > end_index
+
+    mid_index = (start_index + end_index) / 2
+    root = nodes[mid_index]
+    root.left = sorted_array_to_balanced_bst(nodes, start_index, mid_index - 1)
+    root.right = sorted_array_to_balanced_bst(nodes, mid_index + 1, end_index)
+    root
   end
 end
