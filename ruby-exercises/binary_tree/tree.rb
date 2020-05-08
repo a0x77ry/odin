@@ -30,9 +30,7 @@ class Tree
     root
   end
 
-  # rubocop:disable all
   def delete(data, root = @root)
-  # rubocop:enable all
     return nil if root.nil?
 
     if data < root.data
@@ -62,9 +60,7 @@ class Tree
     nodes.min
   end
 
-  # rubocop:disable all
   def level_order(root = @root)
-  # rubocop:enable all
     return if root.nil?
 
     queue = []
@@ -79,31 +75,17 @@ class Tree
     return data_results unless data_results.empty?
   end
 
-  def preorder(results = [], root = @root, &block)
-    return if root.nil?
+  %w[pre in post].each do |prefix|
+    define_method("#{prefix}order") do |results = [], root = @root, &block|
+      return if root.nil?
 
-    block_given? ? block.call(root) : results << root.data
-    preorder(results, root.left, &block) unless root.left.nil?
-    preorder(results, root.right, &block) unless root.right.nil?
-    return results unless results.empty?
-  end
-
-  def inorder(results = [], root = @root, &block)
-    return if root.nil?
-
-    inorder(results, root.left, &block) unless root.left.nil?
-    block_given? ? block.call(root) : results << root.data
-    inorder(results, root.right, &block) unless root.right.nil?
-    return results unless results.empty?
-  end
-
-  def postorder(results = [], root = @root, &block)
-    return if root.nil?
-
-    postorder(results, root.left, &block) unless root.left.nil?
-    postorder(results, root.right, &block) unless root.right.nil?
-    block_given? ? block.call(root) : results << root.data
-    return results unless results.empty?
+      !block.nil? ? block.call(root) : results << root.data if __method__ == :preorder
+      __send__(__method__, results, root.left, &block) unless root.left.nil?
+      !block.nil? ? block.call(root) : results << root.data if __method__ == :inorder
+      __send__(__method__, results, root.right, &block) unless root.right.nil?
+      !block.nil? ? block.call(root) : results << root.data if __method__ == :postorder
+      return results unless results.empty?
+    end
   end
 
   def find(data, root = @root)
@@ -138,9 +120,7 @@ class Tree
     @root = sorted_array_to_balanced_bst(sorted_arr, 0, sorted_arr.length - 1)
   end
 
-  # rubocop:disable all
   def balanced?(height, root = @root)
-  # rubocop:enable all
     return true if root.nil?
 
     left_height = Height.new
@@ -156,5 +136,11 @@ class Tree
     return left_balanced && right_balanced if (lh - rh).abs <= 1
 
     false
+  end
+
+  def depth(root = @root)
+    return 0 if root.nil?
+
+    [depth(root.left), depth(root.right)].max + 1
   end
 end
